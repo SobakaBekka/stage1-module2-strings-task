@@ -1,10 +1,13 @@
 package com.epam.mjc;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class MethodParser {
 
     /**
-     * Parses string that represents a method signature and stores all it's members into a {@link MethodSignature} object.
-     * signatureString is a java-like method signature with following parts:
+     * Parses string that represents a method signature and stores all its members into a {@link MethodSignature} object.
+     * signatureString is a java-like method signature with the following parts:
      *      1. access modifier - optional, followed by space: ' '
      *      2. return type - followed by space: ' '
      *      3. method name
@@ -20,6 +23,43 @@ public class MethodParser {
      * @return {@link MethodSignature} object filled with parsed values from source string
      */
     public MethodSignature parseFunction(String signatureString) {
-        throw new UnsupportedOperationException("You should implement this method.");
+        // Разделяем строку на две части: до скобок и внутри скобок
+        String[] parts = signatureString.split("\\(");
+        String beforeArgs = parts[0].trim(); // Часть до скобок
+        String argsPart = parts[1].replace(")", "").trim(); // Часть внутри скобок
+
+        // Разбираем часть до скобок
+        String[] beforeArgsParts = beforeArgs.split(" ");
+        String accessModifier = null;
+        String returnType;
+        String methodName;
+
+        if (beforeArgsParts.length == 3) {
+            accessModifier = beforeArgsParts[0];
+            returnType = beforeArgsParts[1];
+            methodName = beforeArgsParts[2];
+        } else {
+            returnType = beforeArgsParts[0];
+            methodName = beforeArgsParts[1];
+        }
+
+        // Разбираем аргументы
+        List<MethodSignature.Argument> arguments = new ArrayList<>();
+        if (!argsPart.isEmpty()) {
+            String[] args = argsPart.split(",");
+            for (String arg : args) {
+                String[] argParts = arg.trim().split(" ");
+                String argType = argParts[0];
+                String argName = argParts[1];
+                arguments.add(new MethodSignature.Argument(argType, argName));
+            }
+        }
+
+        // Создаем объект MethodSignature
+        MethodSignature methodSignature = new MethodSignature(methodName, arguments);
+        methodSignature.setAccessModifier(accessModifier);
+        methodSignature.setReturnType(returnType);
+
+        return methodSignature;
     }
 }
